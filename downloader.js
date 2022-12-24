@@ -87,7 +87,40 @@ app.post("/video", async function (req, res) {
   //   })
   //   .catch((e) => console.log(e));
 });
+app.get("/get-videos", async function (req, res) {
+  try {
+    Fs.readdir("media", (err, files) => {
+      return res.status(200).json({
+        data: files,
+      });
+    });
+  } catch (exception) {
+    console.log("exception", exception);
+    return res.status(500).json({
+      message: exception.message,
+    });
+  }
+});
+app.delete("/delete-video", async function (req, res) {
+  try {
+    const fileName = req.body.fileName;
+    const path = Path.resolve(__dirname, "media", fileName);
+    Fs.unlink(path, (err) => {
+      if (err) {
+        throw err;
+      }
 
-app.listen(8001, function () {
+      return res.status(200).json({
+        message: "file deleted successfully",
+      });
+    });
+  } catch (exception) {
+    console.log(exception);
+    return res.status(500).json({
+      message: exception.message,
+    });
+  }
+});
+app.listen(8000, function () {
   console.log("Listening on port 8000!");
 });
