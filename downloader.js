@@ -27,57 +27,61 @@ app.post("/video", async function (req, res) {
     .tiklydown(url)
     .then((result) => {
       downloadingUrl = result.video.noWatermark;
-      function one(tasks) {
-        tasks.run().catch((e) => {
-          console.log(e);
-          res.json({ message: "Some error occured" });
-          throw new Error(e);
-        });
-      }
 
-      if (process.argv) {
-        const tasks = [
-          {
-            title: "Downloading",
-            task: async (ctx, task) => {
-              const url = downloadingUrl;
-              const videoPath = Date.now() + "_video.mp4";
-              const path = Path.resolve(__dirname, "media", videoPath);
+      return res.status(200).json({
+        success: true,
+        data:downloadingUrl
+      })
+      // function one(tasks) {
+      //   tasks.run().catch((e) => {
+      //     console.log(e);
+      //     res.json({ message: "Some error occured" });
+      //     throw new Error(e);
+      //   });
+      // }
 
-              const response = await Axios({
-                method: "GET",
-                url: url,
-                responseType: "stream",
-              });
+      // if (process.argv) {
+      //   const tasks = [
+      //     {
+      //       title: "Downloading",
+      //       task: async (ctx, task) => {
+      //         const url = downloadingUrl;
+      //         const videoPath = Date.now() + "_video.mp4";
+      //         const path = Path.resolve(__dirname, "media", videoPath);
 
-              response.data.pipe(Fs.createWriteStream(path));
+      //         const response = await Axios({
+      //           method: "GET",
+      //           url: url,
+      //           responseType: "stream",
+      //         });
 
-              return new Promise((resolve, reject) => {
-                response.data.on("end", () => {
-                  res.status(200).json({
-                    success: true,
-                    data: "http://localhost:8001/" + videoPath,
-                  });
-                  resolve();
-                });
+      //         response.data.pipe(Fs.createWriteStream(path));
 
-                response.data.on("error", (err) => {
-                  reject(err);
-                });
-              });
-            },
-          },
-        ];
+      //         return new Promise((resolve, reject) => {
+      //           response.data.on("end", () => {
+      //             res.status(200).json({
+      //               success: true,
+      //               data: "http://localhost:8000/" + videoPath,
+      //             });
+      //             resolve();
+      //           });
 
-        one(new Listr(tasks));
-      }
+      //           response.data.on("error", (err) => {
+      //             reject(err);
+      //           });
+      //         });
+      //       },
+      //     },
+      //   ];
+
+      //   one(new Listr(tasks));
+      // }
     })
     .catch((e) => {
       console.log(e);
-      res.status(502).json({
+      return res.status(502).json({
         message: e.message,
       });
-      throw new Error(e);
     });
 
   // tiktok
